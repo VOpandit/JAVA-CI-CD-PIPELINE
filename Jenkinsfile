@@ -1,4 +1,3 @@
-
 def COMMIT
 def BRANCH_NAME
 def GIT_BRANCH
@@ -7,15 +6,15 @@ pipeline
  agent any
  environment
  {
-     AWS_ACCOUNT_ID="<Your account Id>"
-     AWS_DEFAULT_REGION="us-east-1" 
-     IMAGE_REPO_NAME="mavenwebapp"
-     REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
+    AWS_ACCOUNT_ID="930264708953"
+   AWS_DEFAULT_REGION="us-east-1" 
+   IMAGE_REPO_NAME="mavenwebapp"
+   REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
      
  }
  tools
  {
-      maven 'MAVEN_3.8.4'
+    maven 'MAVEN_3.8.4'
  }   
 
  options 
@@ -31,9 +30,10 @@ pipeline
          {
              script
              {
-                 checkout([$class: 'GitSCM', branches: [[name: '*/development']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/NITHIN-JOHN-GEORGE/JAVA-CI-CD-PIPELINE.git']]])
+                 checkout([$class: 'GitSCM', branches: [[name: '*/development']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/dev1git/maven-web-application.git']]])
                  COMMIT = sh (script: "git rev-parse --short=10 HEAD", returnStdout: true).trim()  
-                 
+                 BRANCH_NAME = sh(script: 'git name-rev --name-only HEAD', returnStdout: true)
+                 GIT_BRANCH = BRANCH_NAME.substring(BRANCH_NAME.lastIndexOf('/') + 1, BRANCH_NAME.length()) 
                  
                  
 
@@ -66,6 +66,35 @@ pipeline
              {
                 waitForQualityGate abortPipeline: true, credentialsId: 'SONARQUBE-CRED'
             }
+         }
+     }
+     
+     stage('Nexus Upload')
+     {
+         steps
+         {
+             script
+             {
+                 def readPom = readMavenPom file: 'pom.xml'
+                 def nexusrepo = readPom.version.endsWith("SNAPSHOT") ? "wallmart-snapshot" : "wallmart-release"
+                 nexusArtifactUploader artifacts: 
+                 [
+                     [
+                         artifactId: "${readPom.artifactId}",
+                         classifier: '', 
+                         file: "target/${readPom.artifactId}-${readPom.version}.war", 
+                         type: 'war'
+                     ]
+                ], 
+                         credentialsId: 'Nexus-Cred', 
+                         groupId: "${readPom.groupId}", 
+                         nexusUrl: '3.82.213.203:8081', 
+                         nexusVersion: 'nexus3', 
+                         protocol: 'http', 
+                         repository: "${nexusrepo}", 
+                         version: "${readPom.version}"
+
+             }
          }
      }
      stage('Login to AWS ECR')
@@ -114,7 +143,8 @@ pipeline
      {
          steps
          {
-             sh 'kubectl apply -f deployment.yaml --record=true'
+             
+             sh '/usr/local/bin/kubectl apply -f deployment.yaml --record=true'
              sh """#!/bin/bash
              sed -i 's/$COMMIT/VERSION/g' deployment.yaml
              """
@@ -139,7 +169,7 @@ pipeline
         Regards,
  
         Nithin John George
-        ''', compressLog: true, replyTo: '<Your mail id>', 
+        ''', compressLog: true, replyTo: 'njdevops321@gmail.com', 
         subject: '$PROJECT_NAME - $BUILD_NUMBER - $BUILD_STATUS', to: 'njdevops321@gmail.com'
      }
      failure
@@ -152,8 +182,8 @@ pipeline
         Regards,
  
         Nithin John George
-        ''', compressLog: true, replyTo: '<Your mail id>', 
-        subject: '$PROJECT_NAME - $BUILD_NUMBER - $BUILD_STATUS', to: '<Your mail id>'
+        ''', compressLog: true, replyTo: 'njdevops321@gmail.com', 
+        subject: '$PROJECT_NAME - $BUILD_NUMBER - $BUILD_STATUS', to: 'njdevops321@gmail.com'
      }
  }
 
