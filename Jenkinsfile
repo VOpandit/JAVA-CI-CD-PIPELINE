@@ -16,18 +16,18 @@ pipeline
     }
  
 
-    options 
-    {
-        buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '4', daysToKeepStr: '', numToKeepStr: '4')
-        timestamps()
-    }
+    //options 
+    //{
+    //    buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '4', daysToKeepStr: '', numToKeepStr: '4')
+    //    timestamps()
+    //}
     stages
     {
         stage('Code checkout') {
             steps{
                 script
                 {
-                    checkout([$class: 'GitSCM', branches: [[name: '*/development']], extensions: [], userRemoteConfigs: [[credentialsId: 'GIT_HUB_CREDENTIAL', url: 'https://github.com/VOpandit/JAVA-CI-CD-PIPELINE.git']]])
+                    checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'GIT_HUB_CREDENTIAL', url: 'https://github.com/VOpandit/JAVA-CI-CD-PIPELINE.git']]])
                     COMMIT = sh (script: "git rev-parse --short=10 HEAD", returnStdout: true).trim()  
                 }
             }
