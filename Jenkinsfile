@@ -9,8 +9,7 @@ pipeline
     AWS_ACCOUNT_ID="245218175547"
    AWS_DEFAULT_REGION="ap-south-1" 
    IMAGE_REPO_NAME="mavenwebapp"
-   REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
-     
+   REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"    
  }
  tools 
  {
@@ -53,7 +52,7 @@ pipeline
      {
          steps
          {
-            withSonarQubeEnv('SONARQUBE_TOCKEN') {
+            withSonarQubeEnv('SONARQUBE_TOCKEN')
              {
                 sh "mvn sonar:sonar"
              }  
