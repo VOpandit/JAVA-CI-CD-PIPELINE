@@ -48,16 +48,26 @@ pipeline
              sh "mvn clean package"
          }
      }
-     stage('Execute Sonarqube Report')
-     {
-         steps
-         {
-            withSonarQubeEnv('SONARQUBE_TOCKEN')
-             {
-                sh "mvn sonar:sonar"
-             }  
-         }
-     }
+     stage('build && SonarQube analysis') {
+            steps {
+                withSonarQubeEnv('SONARQUBE_TOCKEN') {
+                    // Optionally use a Maven environment you've configured already
+                    withMaven(maven:'Maven 3.5') {
+                        sh 'mvn clean package sonar:sonar'
+                    }
+                }
+            }
+        }
+     //stage('Execute Sonarqube Report')
+     //{
+     //    steps
+     //    {
+     //       withSonarQubeEnv('SONARQUBE_TOCKEN')
+     //        {
+     //           sh "mvn sonar:sonar"
+     //        }  
+     //    }
+     //}
      stage('Quality Gate Check')
      {
          steps
