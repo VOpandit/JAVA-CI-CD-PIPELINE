@@ -34,9 +34,6 @@ pipeline
                  COMMIT = sh (script: "git rev-parse --short=10 HEAD", returnStdout: true).trim()  
                  BRANCH_NAME = sh(script: 'git name-rev --name-only HEAD', returnStdout: true)
                  GIT_BRANCH = BRANCH_NAME.substring(BRANCH_NAME.lastIndexOf('/') + 1, BRANCH_NAME.length()) 
-                 
-                 
-
              }
              
          }
@@ -48,26 +45,17 @@ pipeline
              sh "mvn clean package"
          }
      }
-     stage('build && SonarQube analysis') {
-            steps {
-             withSonarQubeEnv(credentialsId: 'SonarQube'){
-                    // Optionally use a Maven environment you've configured already
-                    withMaven(maven:'Maven 3.5') {
-                        sh 'mvn clean package sonar:sonar'
-                    }
-                }
-            }
-        }
-     //stage('Execute Sonarqube Report')
-     //{
-     //    steps
-     //    {
-     //       withSonarQubeEnv('SONARQUBE_TOCKEN')
-     //        {
-     //           sh "mvn sonar:sonar"
-     //        }  
-     //    }
-     //}
+    
+     stage('Execute Sonarqube Report')
+     {
+         steps
+         {
+            withSonarQubeEnv('Sonarqube-Server') 
+             {
+                sh "mvn sonar:sonar"
+             }  
+         }
+     }
      stage('Quality Gate Check')
      {
          steps
