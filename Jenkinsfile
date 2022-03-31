@@ -53,7 +53,7 @@ pipeline
      {
          steps
          {
-            withSonarQubeEnv('Sonarqube-Server') 
+            withSonarQubeEnv('SONARQUBE_TOCKEN') {
              {
                 sh "mvn sonar:sonar"
              }  
