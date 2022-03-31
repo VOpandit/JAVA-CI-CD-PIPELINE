@@ -27,7 +27,7 @@ pipeline
         stage('Code checkout') {
             steps {
                 script {
-                    checkout([$class: 'GitSCM', branches: [[name: '*/deployment']], extensions: [], userRemoteConfigs: [[credentialsId: 'GIT_HUB_CREDENTIAL', url: 'https://github.com/VOpandit/JAVA-CI-CD-PIPELINE.git']]])
+                    checkout([$class: 'GitSCM', branches: [[name: '*/development']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/VOpandit/JAVA-CI-CD-PIPELINE.git']]])
                     COMMIT = sh (script: "git rev-parse --short=10 HEAD", returnStdout: true).trim()  
                 }
             }
@@ -120,4 +120,5 @@ pipeline
             subject: '$PROJECT_NAME - $BUILD_NUMBER - $BUILD_STATUS', to: '<Your mail id>'
         }
     }
+
 }
